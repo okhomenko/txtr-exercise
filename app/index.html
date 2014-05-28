@@ -24,73 +24,22 @@
 <script src="js/modules.js"></script>
 
 <!-- Libs -->
+<script src="js/lib/noop.js"></script>
 <script src="js/lib/ajax.js"></script>
+<script src="js/lib/compile.js"></script>
 
 <!-- Components -->
-<script src="js/components/SearchBox.js"></script>
-<script src="js/components/BookBox.js"></script>
-<script src="js/components/BookBlock.js"></script>
+<script src="js/components/store/StoreBlock.js"></script>
+<script src="js/components/store/StoreBox.js"></script>
+<script src="js/components/store/StoreSearchBox.js"></script>
+<script src="js/components/Books.js"></script>
+<script src="js/components/Book.js"></script>
 
-<!--<script src="js/app.js"></script>-->
-
-<script type="text/template" id="book-store">
-    <form class="bookstore">
-        <!-- BookBlock -->
-        <!-- ShelfBlock -->
-    </form>
-</script>
-
-<script type="text/template" id="book-block">
-    <div class="book-block">
-        <!-- SearchBox -->
-        <!-- BookBox -->
-    </div>
-</script>
-
-<script type="text/template" id="search-box">
-    <div class="search-box">
-        <label>
-            <span>Search:</span>
-            <input autofocus type="search" />
-        </label>
-    </div>
-</script>
-
-<script type="text/template" id="book">
-    <li class="book">
-        <img class="img" />
-
-    </li>
-</script>
-
-<script type="text/template" id="book-box">
-    <ul class="book-box">
-        <!-- List of books -->
-    </ul>
-</script>
-
-<script type="text/template" id="shelf-block">
-    <div class="shelf-block">
-        <!-- DnDPlaceholder -->
-        <!-- Shelfbox -->
-    </div>
-</script>
-
-<script type="text/template" id="dnd-placeholder">
-
-    <div class="dnd-placeholder">
-        <p>Drag and Drop</p>
-    </div>
-
-</script>
-
-<script type="text/template" id="shelf-box">
-    <ul class="shelf-box">
-    </ul>
-</script>
-
+<script src="js/app.js"></script>
 
 <script>
+    (function () {
+
     function compile(template) {
         var container, children;
 
@@ -107,15 +56,15 @@
 
     var blnContainer,
         bookStore,
-        bookBlock, searchBox, bookBox, bookTmpl,
+        storeBlock, searchBox, storeBox, bookTmpl,
         shelfBlock, dndPlaceholder, shelfBox;
 
     bookStore = compile(document.querySelector('#book-store').innerText);
 
-    bookBlock = compile(document.querySelector('#book-block').innerText);
+    storeBlock = compile(document.querySelector('#book-block').innerText);
     bookTmpl = compile(document.querySelector('#book').innerText);
     searchBox = compile(document.querySelector('#search-box').innerText);
-    bookBox = compile(document.querySelector('#book-box').innerText);
+    storeBox = compile(document.querySelector('#store-box').innerText);
 
     shelfBlock = compile(document.querySelector('#shelf-block').innerText);
     dndPlaceholder = compile(document.querySelector('#dnd-placeholder').innerText);
@@ -124,7 +73,7 @@
 
     blnContainer = document.querySelector('.bln-container');
 
-    bookBlock.appendChild(searchBox);
+    storeBlock.appendChild(searchBox);
 
     var staticBooks = [
         {author: 'Alex', title: 'Peace and War', 'img': '', id: 1},
@@ -133,27 +82,33 @@
         {author: 'Lena', title: 'Google Analytics', 'img': '', id: 4}
     ];
 
+    function noop() {}
+
     function renderBook(book) {
         var clone = bookTmpl.cloneNode(true);
 
-//        clone.querySelector('.title').innerText = book.title;
-//        clone.querySelector('.author').innerText = book.author;
-        clone.querySelector('.img').src = book.cover_image_url;
 
-        clone.setAttribute('data-id', book.udid);
-
-        return clone;
     }
 
-    function renderBooks(books) {
-        bookBox.innerHTML = '';
+    function renderBooks(books, cb) {
+        var container = document.createDocumentFragment();
 
         books.map(renderBook).forEach(function (el) {
-            bookBox.appendChild(el);
+            container.appendChild(el);
         });
+
+        (cb || noop)(container);
     }
 
-    function renderBooksError(books) {
+    function renderStoreBox(books) {
+        renderBooks(books, function (els) {
+            storeBox.innerHTML = '';
+            storeBox.appendChild(els);
+        });
+
+    }
+
+    function renderStoreBoxError(books) {
         console.log(books);
     }
 
@@ -166,33 +121,70 @@
         xhr = ajax({
             url: url + '?' + 'q=' + query,
             dataType: 'json',
-            success: renderBooks,
-            error: renderBooksError
+            success: renderStoreBox,
+            error: renderStoreBoxError
         });
 
         return xhr;
     }
 
-    searchBox.addEventListener('keydown', (function () {
-        var hTimeout, tts = 600; // time to send
-        return function (e) {
-            var q = e.target.value.trim();
-            if (q === '') return;
+    searchBox.addEventListener('keydown', function (e) {
+        if (e.keyCode !== 13) return;
 
-            if (hTimeout) clearTimeout(hTimeout);
+        var q = e.target.value.trim();
+        if (q === '') return;
 
-            hTimeout = setTimeout(function () { refreshBooks(q) }, tts);
-        };
-    }()));
+        refreshBooks(q);
+        e.preventDefault();
+    });
 
-    bookBlock.appendChild(bookBox);
-    bookStore.appendChild(bookBlock);
+    storeBlock.appendChild(storeBox);
+
+    storeBox.addEventListener('dragstart', function (e) {
+        var _this = e.target;
+
+        if ([].indexOf.call(_this.classList, 'book') === -1) return false;
+        e.dataTransfer.setData('application/json', JSON.stringify(_this.model));
+
+    }, false);
+
+    bookStore.appendChild(storeBlock);
 
     shelfBlock.appendChild(dndPlaceholder);
     shelfBlock.appendChild(shelfBox);
+
+    function handleDragOver(e) {
+        if (e.preventDefault) e.preventDefault(); // allows us to drop
+        return false;
+    }
+
+    function handleDrop(e) {
+        var book = JSON.parse(e.dataTransfer.getData('application/json'));
+
+        pushToShelf(book);
+        return false;
+    }
+
+    function renderShelfBox(books) {
+        renderBooks(books, function (els) {
+            shelfBox.appendChild(els);
+        });
+    }
+
+    var localBooks = JSON.parse(localStorage.getItem('shelf')) || [];
+    function pushToShelf(book) {
+        localBooks.push(book);
+        renderShelfBox(localBooks);
+    }
+
+    shelfBox.addEventListener('drop', handleDrop);
+    shelfBox.addEventListener('dragover', handleDragOver);
+
     bookStore.appendChild(shelfBlock);
 
     blnContainer.appendChild(bookStore);
+    })
+
 
 </script>
 

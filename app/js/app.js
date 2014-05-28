@@ -9,12 +9,8 @@
         console.log('error - ', xhr);
     }
 
-    BLN.ajax({
-        url: 'http://turbine-staging-eu.herokuapp.com/books?q=ruby',
-        success: success,
-        error: error,
-        dataType: 'json'
-    }).abort();
 
-    document.querySelector('.bookstore').appendChild((new BLN.BookBlock).render().el)
+    var storeBlock = BLN.StoreBlock.render();
+
+    document.querySelector('.bln-container').appendChild(storeBlock.el);
 }(window, window.BLN));
