@@ -2,14 +2,14 @@
     'use strict';
 
     BLN.BookPlaceholder = {
-        template: '<li class="book placeholder">Drop here</li>',
+        template: '<li class="book placeholder"></li>',
 
         render: function (cb) {
-            this.el = BLN.compile(this.template);
+            this.cachedEl = this.cachedEl || BLN.compile(this.template);
 
-            (cb || BLN.noop)(this.el);
+            var clone = this.cachedEl.cloneNode(true);
 
-            return this;
+            (cb || BLN.noop)(clone);
         }
     };
 
