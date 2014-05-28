@@ -1,0 +1,16 @@
+{
+  "name": "txtr-exercise",
+  "version": "0.0.1",
+  "description": "",
+  "author": "Alex Khomenko <okhomenko@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+      "http-server": "*",
+      "karma": "*",
+      "karma-mocha": "*",
+      "karma-sinon-chai": "*",
+      "karma-coverage": "*",
+      "karma-phantomjs-launcher": "*",
+      "protractor": "*"
+  }
+}
