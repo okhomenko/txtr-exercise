@@ -34,7 +34,6 @@
             this.el.addEventListener('keydown', function (e) {
                 var code = e.keyCode || e.which;
 
-                console.log(_this, _this.el);
                 if (code !== 13) return;
                 var q = _this.q.value.trim();
                 if (q === '') return;

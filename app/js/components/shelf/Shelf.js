@@ -3,7 +3,7 @@
 
     BLN.Shelf = {
         books: [],
-        template: '<div class="shelf-block"></div>',
+        template: '<div class="shelf-block"><label>Shelf</label></div>',
 
         render: function (cb) {
             var _this = this;
@@ -29,13 +29,12 @@
             return false;
         },
 
-        bookExists: function (book) {
-
-        },
-
         handleDrop: function (e) {
-            var _this = this;
-            var book = JSON.parse(e.dataTransfer.getData('application/json'));
+            var _this = this, data;
+
+            data = e.dataTransfer.getData('application/json');
+            if (!data) return false;
+            var book = JSON.parse(data);
 
             if (_this.collection.exists(book)) return false;
 

@@ -11,6 +11,7 @@
         add: function (model) {
             this.models.push(model);
             this.save();
+            console.log(JSON.stringify(this.models));
         },
 
         save: function () {

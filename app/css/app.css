@@ -1,5 +1,7 @@
 .book-box {
     min-height: 100px;
+    max-height: 200px;
+    overflow: scroll;
     border-radius: 5px;
     border: 3px lightgrey dashed;
 }
@@ -14,7 +16,6 @@
 
     display: inline-block;
 }
-
 
 .book-box .img {
     width: 130px;
