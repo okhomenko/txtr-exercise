@@ -11,6 +11,7 @@
       "karma-sinon-chai": "*",
       "karma-coverage": "*",
       "karma-phantomjs-launcher": "*",
-      "protractor": "*"
+      "protractor": "*",
+      "watchify": "*"
   }
 }

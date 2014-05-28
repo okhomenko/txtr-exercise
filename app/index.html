@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Blloon bookshelf</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <link rel="stylesheet" href="css/blloon-styles.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div class="bln-container">
+
+</div>
+
+<script src="js/modules.js"></script>
+
+<!-- Libs -->
+<script src="js/lib/ajax.js"></script>
+
+<!-- Components -->
+<script src="js/components/SearchBox.js"></script>
+<script src="js/components/BookBox.js"></script>
+<script src="js/components/BookBlock.js"></script>
+
+<!--<script src="js/app.js"></script>-->
+
+<script type="text/template" id="book-store">
+    <form class="bookstore">
+        <!-- BookBlock -->
+        <!-- ShelfBlock -->
+    </form>
+</script>
+
+<script type="text/template" id="book-block">
+    <div class="book-block">
+        <!-- SearchBox -->
+        <!-- BookBox -->
+    </div>
+</script>
+
+<script type="text/template" id="search-box">
+    <div class="search-box">
+        <label>
+            <span>Search:</span>
+            <input autofocus type="search" />
+        </label>
+    </div>
+</script>
+
+<script type="text/template" id="book">
+    <li class="book">
+        <img class="img" />
+
+    </li>
+</script>
+
+<script type="text/template" id="book-box">
+    <ul class="book-box">
+        <!-- List of books -->
+    </ul>
+</script>
+
+<script type="text/template" id="shelf-block">
+    <div class="shelf-block">
+        <!-- DnDPlaceholder -->
+        <!-- Shelfbox -->
+    </div>
+</script>
+
+<script type="text/template" id="dnd-placeholder">
+
+    <div class="dnd-placeholder">
+        <p>Drag and Drop</p>
+    </div>
+
+</script>
+
+<script type="text/template" id="shelf-box">
+    <ul class="shelf-box">
+    </ul>
+</script>
+
+
+<script>
+    function compile(template) {
+        var container, children;
+
+        container = document.createElement('div');
+        container.innerHTML = template;
+        children = container.children;
+
+        if (children.length > 1) throw new Error('Only one root node allowed');
+
+        return children[0];
+    }
+
+    var ajax = BLN.ajax;
+
+    var blnContainer,
+        bookStore,
+        bookBlock, searchBox, bookBox, bookTmpl,
+        shelfBlock, dndPlaceholder, shelfBox;
+
+    bookStore = compile(document.querySelector('#book-store').innerText);
+
+    bookBlock = compile(document.querySelector('#book-block').innerText);
+    bookTmpl = compile(document.querySelector('#book').innerText);
+    searchBox = compile(document.querySelector('#search-box').innerText);
+    bookBox = compile(document.querySelector('#book-box').innerText);
+
+    shelfBlock = compile(document.querySelector('#shelf-block').innerText);
+    dndPlaceholder = compile(document.querySelector('#dnd-placeholder').innerText);
+    shelfBox = compile(document.querySelector('#shelf-box').innerText);
+
+
+    blnContainer = document.querySelector('.bln-container');
+
+    bookBlock.appendChild(searchBox);
+
+    var staticBooks = [
+        {author: 'Alex', title: 'Peace and War', 'img': '', id: 1},
+        {author: 'Igod', title: 'Greatful dead', 'img': '', id: 2},
+        {author: 'Dima', title: 'Pink Floyd', 'img': '', id: 3},
+        {author: 'Lena', title: 'Google Analytics', 'img': '', id: 4}
+    ];
+
+    function renderBook(book) {
+        var clone = bookTmpl.cloneNode(true);
+
+//        clone.querySelector('.title').innerText = book.title;
+//        clone.querySelector('.author').innerText = book.author;
+        clone.querySelector('.img').src = book.cover_image_url;
+
+        clone.setAttribute('data-id', book.udid);
+
+        return clone;
+    }
+
+    function renderBooks(books) {
+        bookBox.innerHTML = '';
+
+        books.map(renderBook).forEach(function (el) {
+            bookBox.appendChild(el);
+        });
+    }
+
+    function renderBooksError(books) {
+        console.log(books);
+    }
+
+
+    function refreshBooks(query) {
+        var url, xhr;
+
+        url = 'http://turbine-staging-eu.herokuapp.com/books';
+
+        xhr = ajax({
+            url: url + '?' + 'q=' + query,
+            dataType: 'json',
+            success: renderBooks,
+            error: renderBooksError
+        });
+
+        return xhr;
+    }
+
+    searchBox.addEventListener('keydown', (function () {
+        var hTimeout, tts = 600; // time to send
+        return function (e) {
+            var q = e.target.value.trim();
+            if (q === '') return;
+
+            if (hTimeout) clearTimeout(hTimeout);
+
+            hTimeout = setTimeout(function () { refreshBooks(q) }, tts);
+        };
+    }()));
+
+    bookBlock.appendChild(bookBox);
+    bookStore.appendChild(bookBlock);
+
+    shelfBlock.appendChild(dndPlaceholder);
+    shelfBlock.appendChild(shelfBox);
+    bookStore.appendChild(shelfBlock);
+
+    blnContainer.appendChild(bookStore);
+
+</script>
+
+</body></html>
