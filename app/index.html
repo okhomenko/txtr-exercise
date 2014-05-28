@@ -29,9 +29,13 @@
 <script src="js/lib/compile.js"></script>
 
 <!-- Components -->
-<script src="js/components/store/StoreBlock.js"></script>
+<script src="js/components/store/Store.js"></script>
 <script src="js/components/store/StoreBox.js"></script>
 <script src="js/components/store/StoreSearchBox.js"></script>
+
+<script src="js/components/shelf/Shelf.js"></script>
+<script src="js/components/shelf/ShelfBox.js"></script>
+
 <script src="js/components/Books.js"></script>
 <script src="js/components/Book.js"></script>
 
@@ -140,30 +144,13 @@
 
     storeBlock.appendChild(storeBox);
 
-    storeBox.addEventListener('dragstart', function (e) {
-        var _this = e.target;
 
-        if ([].indexOf.call(_this.classList, 'book') === -1) return false;
-        e.dataTransfer.setData('application/json', JSON.stringify(_this.model));
-
-    }, false);
 
     bookStore.appendChild(storeBlock);
 
     shelfBlock.appendChild(dndPlaceholder);
     shelfBlock.appendChild(shelfBox);
 
-    function handleDragOver(e) {
-        if (e.preventDefault) e.preventDefault(); // allows us to drop
-        return false;
-    }
-
-    function handleDrop(e) {
-        var book = JSON.parse(e.dataTransfer.getData('application/json'));
-
-        pushToShelf(book);
-        return false;
-    }
 
     function renderShelfBox(books) {
         renderBooks(books, function (els) {

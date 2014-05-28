@@ -1,7 +1,7 @@
 (function (BLN) {
     'use strict';
 
-    BLN.StoreBlock = {
+    BLN.Store = {
         template: '<div class="store-block"></div>',
 
         render: function (cb) {

@@ -10,7 +10,9 @@
     }
 
 
-    var storeBlock = BLN.StoreBlock.render();
+    var store = BLN.Store.render();
+    var shelf = BLN.Shelf.render();
 
-    document.querySelector('.bln-container').appendChild(storeBlock.el);
+    document.querySelector('.bln-container').appendChild(store.el);
+    document.querySelector('.bln-container').appendChild(shelf.el);
 }(window, window.BLN));
