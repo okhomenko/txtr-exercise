@@ -1,9 +1,24 @@
+.bln-container {
+    padding: 10px;
+}
+
+.search-box {
+    padding-bottom: 10px;
+}
+
+.dnd-placeholder {
+    color: darkgray;
+    font-size: 150%;
+    text-align: center;
+    text-shadow: 0 1px gray;
+}
+
 .book-box {
-    min-height: 100px;
+    height: 200px;
     max-height: 200px;
     overflow: scroll;
     border-radius: 5px;
-    border: 3px lightgrey dashed;
+    border: 2px lightgrey dashed;
 }
 
 .book-box {

@@ -4,6 +4,7 @@
     BLN.Shelf = {
         template: [
             '<div class="shelf-block">',
+                '<p class="dnd-placeholder">Drag and drop</p>',
                 '<label>Shelf <span class="amount"></span>: ',
                     '<span class="exists-warn hide">' +
                         'This book already is in the list' +
@@ -47,7 +48,7 @@
 
         showExistsWarn: function () {
             this.existsWarn.classList.remove('hide');
-            setTimeout(this.hideExistsWarn.bind(this), 1000);
+            setTimeout(this.hideExistsWarn.bind(this), 3000);
         },
 
         hideExistsWarn: function () {

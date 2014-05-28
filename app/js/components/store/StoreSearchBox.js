@@ -6,10 +6,8 @@
     BLN.StoreSearchBox = {
         template: [
             '<div class="search-box">',
-                '<label>',
-                    '<span>Search:</span>',
-                    '<input autofocus type="search" class="query" />',
-                '</label>',
+                '<label><span>Search:</span></label>',
+                '<input autofocus type="search" class="query" />',
             '</div>'
         ].join(''),
 
