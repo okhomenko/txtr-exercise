@@ -2,12 +2,22 @@
     'use strict';
 
     BLN.Shelf = {
-        books: [],
-        template: '<div class="shelf-block"><label>Shelf</label></div>',
+        template: [
+            '<div class="shelf-block">',
+                '<label>Shelf <span class="amount"></span>: ',
+                    '<span class="exists-warn hide">' +
+                        'This book already is in the list' +
+                    '</span>',
+                '</label>',
+            '</div>'
+        ].join(''),
 
         render: function (cb) {
             var _this = this;
+
             this.el = BLN.compile(this.template);
+            this.amount = this.el.querySelector('.amount');
+            this.existsWarn = this.el.querySelector('.exists-warn');
 
             (cb || BLN.noop)(this.el);
 
@@ -15,13 +25,33 @@
                 _this.el.appendChild(el);
             });
 
-            _this.collection = BLN.ShelfCollection;
-            _this.collection.init();
-            _this.shelfBox.renderBooks(_this.collection.models);
+            this.collection = BLN.ShelfCollection;
+            this.collection.init();
+            this.renderBooks();
 
             this.bind();
 
             return this;
+        },
+
+        updateAmount: function () {
+            var amount = this.collection.models.length;
+            if (amount === 0) return;
+            this.amount.innerText = '(' + amount + ')';
+        },
+
+        renderBooks: function () {
+            this.shelfBox.renderBooks(this.collection.models);
+            this.updateAmount();
+        },
+
+        showExistsWarn: function () {
+            this.existsWarn.classList.remove('hide');
+            setTimeout(this.hideExistsWarn.bind(this), 1000);
+        },
+
+        hideExistsWarn: function () {
+            this.existsWarn.classList.add('hide');
         },
 
         handleDragOver: function (e) {
@@ -36,10 +66,13 @@
             if (!data) return false;
             var book = JSON.parse(data);
 
-            if (_this.collection.exists(book)) return false;
+            if (_this.collection.exists(book)) {
+                _this.showExistsWarn();
+                return false;
+            }
 
             _this.collection.add(book);
-            _this.shelfBox.renderBooks(_this.collection.models);
+            _this.renderBooks();
             return false;
         },
 
