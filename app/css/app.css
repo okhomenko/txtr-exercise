@@ -27,9 +27,21 @@
 }
 
 .book-box .book {
-    margin-right: 10px;
+    margin: 0 10px 10px 0;
 
-    display: inline-block;
+    float: left;
+}
+
+.book-box .book.placeholder {
+    width: 130px;
+    height: 170px;
+    padding: 3px 5px;
+    box-sizing: border-box;
+
+    text-align: center;
+    border: 2px dotted lightgray;
+    color: darkgray;
+    border-radius: 3px;
 }
 
 .book-box .img {
