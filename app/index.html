@@ -21,18 +21,18 @@
 
 </div>
 
+<!-- Init modules -->
 <script src="js/modules.js"></script>
 
 <!-- Libs -->
-<script src="js/lib/noop.js"></script>
-<script src="js/lib/ajax.js"></script>
-<script src="js/lib/compile.js"></script>
+<script src="js/lib/utils.js"></script>
 
 <!-- Components -->
 <script src="js/components/store/Store.js"></script>
 <script src="js/components/store/StoreBox.js"></script>
 <script src="js/components/store/StoreSearchBox.js"></script>
 
+<script src="js/components/shelf/ShelfCollection.js"></script>
 <script src="js/components/shelf/Shelf.js"></script>
 <script src="js/components/shelf/ShelfBox.js"></script>
 
@@ -40,139 +40,5 @@
 <script src="js/components/Book.js"></script>
 
 <script src="js/app.js"></script>
-
-<script>
-    (function () {
-
-    function compile(template) {
-        var container, children;
-
-        container = document.createElement('div');
-        container.innerHTML = template;
-        children = container.children;
-
-        if (children.length > 1) throw new Error('Only one root node allowed');
-
-        return children[0];
-    }
-
-    var ajax = BLN.ajax;
-
-    var blnContainer,
-        bookStore,
-        storeBlock, searchBox, storeBox, bookTmpl,
-        shelfBlock, dndPlaceholder, shelfBox;
-
-    bookStore = compile(document.querySelector('#book-store').innerText);
-
-    storeBlock = compile(document.querySelector('#book-block').innerText);
-    bookTmpl = compile(document.querySelector('#book').innerText);
-    searchBox = compile(document.querySelector('#search-box').innerText);
-    storeBox = compile(document.querySelector('#store-box').innerText);
-
-    shelfBlock = compile(document.querySelector('#shelf-block').innerText);
-    dndPlaceholder = compile(document.querySelector('#dnd-placeholder').innerText);
-    shelfBox = compile(document.querySelector('#shelf-box').innerText);
-
-
-    blnContainer = document.querySelector('.bln-container');
-
-    storeBlock.appendChild(searchBox);
-
-    var staticBooks = [
-        {author: 'Alex', title: 'Peace and War', 'img': '', id: 1},
-        {author: 'Igod', title: 'Greatful dead', 'img': '', id: 2},
-        {author: 'Dima', title: 'Pink Floyd', 'img': '', id: 3},
-        {author: 'Lena', title: 'Google Analytics', 'img': '', id: 4}
-    ];
-
-    function noop() {}
-
-    function renderBook(book) {
-        var clone = bookTmpl.cloneNode(true);
-
-
-    }
-
-    function renderBooks(books, cb) {
-        var container = document.createDocumentFragment();
-
-        books.map(renderBook).forEach(function (el) {
-            container.appendChild(el);
-        });
-
-        (cb || noop)(container);
-    }
-
-    function renderStoreBox(books) {
-        renderBooks(books, function (els) {
-            storeBox.innerHTML = '';
-            storeBox.appendChild(els);
-        });
-
-    }
-
-    function renderStoreBoxError(books) {
-        console.log(books);
-    }
-
-
-    function refreshBooks(query) {
-        var url, xhr;
-
-        url = 'http://turbine-staging-eu.herokuapp.com/books';
-
-        xhr = ajax({
-            url: url + '?' + 'q=' + query,
-            dataType: 'json',
-            success: renderStoreBox,
-            error: renderStoreBoxError
-        });
-
-        return xhr;
-    }
-
-    searchBox.addEventListener('keydown', function (e) {
-        if (e.keyCode !== 13) return;
-
-        var q = e.target.value.trim();
-        if (q === '') return;
-
-        refreshBooks(q);
-        e.preventDefault();
-    });
-
-    storeBlock.appendChild(storeBox);
-
-
-
-    bookStore.appendChild(storeBlock);
-
-    shelfBlock.appendChild(dndPlaceholder);
-    shelfBlock.appendChild(shelfBox);
-
-
-    function renderShelfBox(books) {
-        renderBooks(books, function (els) {
-            shelfBox.appendChild(els);
-        });
-    }
-
-    var localBooks = JSON.parse(localStorage.getItem('shelf')) || [];
-    function pushToShelf(book) {
-        localBooks.push(book);
-        renderShelfBox(localBooks);
-    }
-
-    shelfBox.addEventListener('drop', handleDrop);
-    shelfBox.addEventListener('dragover', handleDragOver);
-
-    bookStore.appendChild(shelfBlock);
-
-    blnContainer.appendChild(bookStore);
-    })
-
-
-</script>
 
 </body></html>

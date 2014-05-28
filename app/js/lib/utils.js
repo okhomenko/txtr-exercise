@@ -1,4 +1,4 @@
-(function (root) {
+(function (BLN) {
     'use strict';
 
     function noop() {}
@@ -34,7 +34,7 @@
                 // success status code
                 if ((xhr.status + '').charAt(0) === '2') {
                     res = opts.dataType === 'json' ? parseJSON(xhr.responseText)
-                                                   : xhr.responseText;
+                        : xhr.responseText;
 
                     (opts.success || noop)(res);
                 } else {
@@ -55,6 +55,21 @@
         return xhr;
     }
 
-    root.ajax = ajax;
+
+    function compile (template) {
+        var container, children;
+
+        container = document.createElement('div');
+        container.innerHTML = template;
+        children = container.childNodes;
+
+        if (children.length > 1) throw new Error('Only one root node allowed');
+
+        return children[0];
+    }
+
+    BLN.noop = noop;
+    BLN.ajax = ajax;
+    BLN.compile = compile;
 
 }(window.BLN));

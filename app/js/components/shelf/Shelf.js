@@ -15,6 +15,10 @@
                 _this.el.appendChild(el);
             });
 
+            _this.collection = BLN.ShelfCollection;
+            _this.collection.init();
+            _this.shelfBox.renderBooks(_this.collection.models);
+
             this.bind();
 
             return this;
@@ -26,31 +30,25 @@
         },
 
         bookExists: function (book) {
-            var id = book.udid;
-            return this.books.some(function (book) {
-                return book.udid === id;
-            });
+
         },
 
         handleDrop: function (e) {
             var _this = this;
             var book = JSON.parse(e.dataTransfer.getData('application/json'));
 
-            if (_this.bookExists(book)) return false;
+            if (_this.collection.exists(book)) return false;
 
-            _this.add(book);
-            _this.shelfBox.renderBooks(_this.books);
+            _this.collection.add(book);
+            _this.shelfBox.renderBooks(_this.collection.models);
             return false;
         },
 
         bind: function () {
             this.el.addEventListener('dragover', this.handleDragOver);
             this.el.addEventListener('drop', this.handleDrop.bind(this));
-        },
-
-        add: function (book) {
-            this.books.push(book);
         }
+
     };
 
 }(window.BLN));
